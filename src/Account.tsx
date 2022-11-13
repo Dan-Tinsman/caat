@@ -3,8 +3,6 @@ import { supabase } from './supabaseClient'
 import { Session } from "@supabase/gotrue-js/src/lib/types"
 import styled from 'styled-components';
 import { FileUploader } from "react-drag-drop-files";
-import userEvent from '@testing-library/user-event';
-import { ClientRequest } from 'http';
 import { saveAs } from 'file-saver';
 
 const Wrapper = styled.section`
@@ -60,11 +58,9 @@ const Account = ({ session }: { session: Session }) => {
     1. [√] Get client upload bucket
     2. [√] Get client download bucket
     3. [√] Display uploads from the same client
-    4. [ ] Display available downloads for the same client
-    5. [ ] Enable downloading the available downloads
+    4. [√] Display available downloads for the same client
+    5. [√] Enable downloading the available downloads
     */
-
-    const [file, setFile] = useState(null)
 
     const [clientName, setClientName] = useState<Client["name"] | null>(null)
     const [uploadBucket, setUploadBucket] = useState<Client["upload_bucket"] | null>(null)
@@ -76,7 +72,10 @@ const Account = ({ session }: { session: Session }) => {
         setBuckets()
         getUploads()
         getAvailableDownloads()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [downloadBucket])
+
+    // TODO: https://reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies
 
     const setBuckets = async () => {
         const { data, error }: ClientResponse = await getBuckets()
@@ -110,8 +109,6 @@ const Account = ({ session }: { session: Session }) => {
 
 
     const handleChange = async (file: any) => {
-        setFile(file);
-
         if (uploadBucket) {
             const { data, error } = await supabase.storage
                 .from(uploadBucket ? uploadBucket : '')

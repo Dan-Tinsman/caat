@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { supabase } from './supabaseClient';
 import { Session } from "@supabase/gotrue-js/src/lib/types"
