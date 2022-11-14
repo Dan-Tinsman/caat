@@ -69,27 +69,69 @@ const Account = ({ session }: { session: Session }) => {
     const [availableDownloads, setAvailableDownloads] = useState<any>(null)
 
     useEffect(() => {
+        async function setBuckets() {
+            const { data, error }: ClientResponse = await getBuckets()
+
+            if (error) {
+                throw error
+            }
+
+            if (data) {
+                setClientName(data.name)
+                setUploadBucket(data.upload_bucket)
+                setDownloadBucket(data.download_bucket)
+            }
+        }
+
+        async function getUploads() {
+            try {
+                const { data, error } = await supabase
+                    .from('uploads')
+                    .select('*')
+
+                if (error) {
+                    throw error
+                }
+
+                if (data) {
+                    setUploads(data)
+                }
+            } catch (error) {
+                alert(JSON.stringify(error))
+            }
+        }
+
+        async function getAvailableDownloads() {
+            if (downloadBucket) {
+                try {
+                    const { data, error } = await supabase
+                        .storage
+                        .from(downloadBucket)
+                        .list(undefined, {
+                            limit: 12,
+                            offset: 0,
+                            sortBy: { column: 'created_at', order: 'desc' },
+                        })
+
+                    if (error) {
+                        throw error
+                    }
+
+                    if (data) {
+                        setAvailableDownloads(data)
+                    }
+                } catch (error) {
+                    alert(JSON.stringify(error))
+                }
+            }
+        }
+
         setBuckets()
         getUploads()
         getAvailableDownloads()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [downloadBucket])
 
     // TODO: https://reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies
-
-    const setBuckets = async () => {
-        const { data, error }: ClientResponse = await getBuckets()
-
-        if (error) {
-            throw error
-        }
-
-        if (data) {
-            setClientName(data.name)
-            setUploadBucket(data.upload_bucket)
-            setDownloadBucket(data.download_bucket)
-        }
-    }
 
     const downloadFileFromBucket = async (bucket: string, path: string) => {
         const { data, error } = await supabase
@@ -106,7 +148,6 @@ const Account = ({ session }: { session: Session }) => {
             saveAs(data, path)
         }
     }
-
 
     const handleChange = async (file: any) => {
         if (uploadBucket) {
@@ -127,51 +168,6 @@ const Account = ({ session }: { session: Session }) => {
             }
         }
     };
-
-    const getUploads = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('uploads')
-                .select('*')
-
-            if (error) {
-                throw error
-            }
-
-            if (data) {
-                setUploads(data)
-            }
-        } catch (error) {
-            alert(JSON.stringify(error))
-        }
-    }
-
-    // how we gonnn do this?
-    // - just query the downloads bucket for available files
-    const getAvailableDownloads = async () => {
-        if (downloadBucket) {
-            try {
-                const { data, error } = await supabase
-                    .storage
-                    .from(downloadBucket)
-                    .list(undefined, {
-                        limit: 12,
-                        offset: 0,
-                        sortBy: { column: 'created_at', order: 'desc' },
-                    })
-
-                if (error) {
-                    throw error
-                }
-
-                if (data) {
-                    setAvailableDownloads(data)
-                }
-            } catch (error) {
-                alert(JSON.stringify(error))
-            }
-        }
-    }
 
     return (
         <PageContainer>
