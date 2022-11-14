@@ -36,6 +36,16 @@ const GridContainer = styled.div`
     justify-items: center;
 `
 
+const Footer = styled.div`
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: red;
+    color: white;
+    text-align: center;
+`
+
 type Client = {
     id: number;
     name: string;
@@ -129,7 +139,7 @@ const Account = ({ session }: { session: Session }) => {
         setBuckets()
         getUploads()
         getAvailableDownloads()
-    }, [downloadBucket])
+    }, [uploadBucket, downloadBucket])
 
     // TODO: https://reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies
 
@@ -163,7 +173,7 @@ const Account = ({ session }: { session: Session }) => {
                 await supabase
                     .from('uploads')
                     .insert([
-                        { path: data.path, user_id: session.user.id, bucket: 'foo-bar-credit-union.data' }
+                        { path: data.path, user_id: session.user.id, bucket: uploadBucket }
                     ])
             }
         }
