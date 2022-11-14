@@ -36,16 +36,6 @@ const GridContainer = styled.div`
     justify-items: center;
 `
 
-const Footer = styled.div`
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: red;
-    color: white;
-    text-align: center;
-`
-
 type Client = {
     id: number;
     name: string;
